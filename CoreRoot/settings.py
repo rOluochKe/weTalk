@@ -146,3 +146,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination'
     'PAGE_SIZE': 12,
 }
+
+# Media files
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "uploads"
+
+# Default avatar URL
+DEFAULT_AVATAR_URL = "https://avatars.dicebear.com/api/identicon/.svg"

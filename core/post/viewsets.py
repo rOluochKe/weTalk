@@ -1,16 +1,16 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 
 from core.abstract.viewsets import AbstractViewSet
 from core.post.models import Post
 from core.post.serializers import PostSerializer
+from core.auth.permissions import UserPermission
 
 
 class PostViewSet(AbstractViewSet):
     http_method_names = ('post', 'get', 'put', 'delete')
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (UserPermission,)
     serializer_class = PostSerializer
 
     def get_queryset(self):
@@ -27,34 +27,26 @@ class PostViewSet(AbstractViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def update(self, instance, validated_data):
-        if not instance.edited:
-            validated_data['edited'] = True
-        instance = super().update(instance, validated_data)
-
-        return instance
-
-    @action(methods=["post"], detail=True)
+    @action(methods=['post'], detail=True)
     def like(self, request, *args, **kwargs):
         post = self.get_object()
         user = self.request.user
 
-        user.like_post(post)
+        user.like(post)
 
-        serializer = self.serializer_class(post, context={"request": request})
+        serializer = self.serializer_class(post)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(methods=["post"], detail=True)
+    @action(methods=['post'], detail=True)
     def remove_like(self, request, *args, **kwargs):
         post = self.get_object()
         user = self.request.user
 
-        user.remove_like_post(post)
+        user.remove_like(post)
 
-        serializer = self.serializer_class(post, context={"request": request})
+        serializer = self.serializer_class(post)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
