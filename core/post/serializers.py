@@ -24,7 +24,7 @@ class PostSerializer(AbstractSerializer):
         if request is None or request.user.is_anonymous:
             return False
 
-        return request.user.has_liked(instance)
+        return request.user.has_liked_post(instance)
 
     def get_likes_count(self, instance):
         return instance.liked_by.count()
@@ -45,7 +45,7 @@ class PostSerializer(AbstractSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         author = User.objects.get_object_by_public_id(rep["author"])
-        rep["author"] = UserSerializer(author).data
+        rep["author"] = UserSerializer(author, context=self.context).data
 
         return rep
 
@@ -63,5 +63,5 @@ class PostSerializer(AbstractSerializer):
             'comments_count',
             'created',
             'updated'
-            ]
+        ]
         read_only_fields = ["edited"]

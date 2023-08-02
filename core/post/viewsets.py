@@ -12,6 +12,7 @@ class PostViewSet(AbstractViewSet):
     http_method_names = ('post', 'get', 'put', 'delete')
     permission_classes = (UserPermission,)
     serializer_class = PostSerializer
+    filterset_fields = ['author__public_id']
 
     def get_queryset(self):
         return Post.objects.all()
@@ -34,9 +35,9 @@ class PostViewSet(AbstractViewSet):
         post = self.get_object()
         user = self.request.user
 
-        user.like(post)
+        user.like_post(post)
 
-        serializer = self.serializer_class(post)
+        serializer = self.serializer_class(post, context={'request': request})
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -45,8 +46,8 @@ class PostViewSet(AbstractViewSet):
         post = self.get_object()
         user = self.request.user
 
-        user.remove_like(post)
+        user.remove_like_post(post)
 
-        serializer = self.serializer_class(post)
+        serializer = self.serializer_class(post, context={'request': request})
 
         return Response(serializer.data, status=status.HTTP_200_OK)
